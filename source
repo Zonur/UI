@@ -1,0 +1,165 @@
+-- Define your UI elements
+local gui = Instance.new("ScreenGui")
+gui.Parent = game.Players.LocalPlayer.PlayerGui
+gui.Name = "CustomUI"
+
+local frame = Instance.new("Frame")
+frame.Parent = gui
+frame.Size = UDim2.new(0, 200, 0, 200)
+frame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+frame.Position = UDim2.new(0.5, -100, 0.5, -100)
+frame.BorderSizePixel = 0
+
+local function createButton(text, callback)
+    local button = Instance.new("TextButton")
+    button.Parent = frame
+    button.Size = UDim2.new(0, 180, 0, 40)
+    button.Position = UDim2.new(0, 10, 0, 10)
+    button.Text = text
+    button.BackgroundColor3 = Color3.new(0.2, 0.4, 0.8)
+    button.TextColor3 = Color3.new(1, 1, 1)
+    button.MouseButton1Click:Connect(callback)
+end
+
+local function createToggle(text, initialValue, callback)
+    local toggleFrame = Instance.new("Frame")
+    toggleFrame.Parent = frame
+    toggleFrame.Size = UDim2.new(0, 180, 0, 40)
+    toggleFrame.Position = UDim2.new(0, 10, 0, 60)
+    toggleFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+    toggleFrame.BorderSizePixel = 0
+
+    local toggleButton = Instance.new("TextButton")
+    toggleButton.Parent = toggleFrame
+    toggleButton.Size = UDim2.new(0, 30, 0, 30)
+    toggleButton.Position = UDim2.new(0, 5, 0, 5)
+    toggleButton.Text = ""
+    toggleButton.BackgroundColor3 = initialValue and Color3.new(0.2, 0.8, 0.2) or Color3.new(0.8, 0.2, 0.2)
+
+    local labelText = Instance.new("TextLabel")
+    labelText.Parent = toggleFrame
+    labelText.Size = UDim2.new(0, 120, 0, 30)
+    labelText.Position = UDim2.new(0, 45, 0, 5)
+    labelText.Text = text
+    labelText.BackgroundColor3 = Color3.new(1, 1, 1)
+
+    local isToggled = initialValue
+    toggleButton.MouseButton1Click:Connect(function()
+        isToggled = not isToggled
+        toggleButton.BackgroundColor3 = isToggled and Color3.new(0.2, 0.8, 0.2) or Color3.new(0.8, 0.2, 0.2)
+        callback(isToggled)
+    end)
+end
+
+local function createDropdown(options, callback)
+    local dropdownFrame = Instance.new("Frame")
+    dropdownFrame.Parent = frame
+    dropdownFrame.Size = UDim2.new(0, 180, 0, 40)
+    dropdownFrame.Position = UDim2.new(0, 10, 0, 110)
+    dropdownFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+    dropdownFrame.BorderSizePixel = 0
+
+    local selectedOption = options[1]
+    
+    local dropdownButton = Instance.new("TextButton")
+    dropdownButton.Parent = dropdownFrame
+    dropdownButton.Size = UDim2.new(0, 150, 0, 30)
+    dropdownButton.Position = UDim2.new(0, 5, 0, 5)
+    dropdownButton.Text = selectedOption
+    dropdownButton.BackgroundColor3 = Color3.new(0.2, 0.4, 0.8)
+    dropdownButton.TextColor3 = Color3.new(1, 1, 1)
+
+    local dropdownList = Instance.new("Frame")
+    dropdownList.Parent = dropdownFrame
+    dropdownList.Size = UDim2.new(0, 150, 0, 0)
+    dropdownList.Position = UDim2.new(0, 5, 0, 35)
+    dropdownList.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+    dropdownList.BorderSizePixel = 0
+
+    for i, option in ipairs(options) do
+        local optionButton = Instance.new("TextButton")
+        optionButton.Parent = dropdownList
+        optionButton.Size = UDim2.new(1, 0, 0, 30)
+        optionButton.Position = UDim2.new(0, 0, 0, (i - 1) * 30)
+        optionButton.Text = option
+        optionButton.BackgroundColor3 = Color3.new(0.2, 0.4, 0.8)
+        optionButton.TextColor3 = Color3.new(1, 1, 1)
+
+        optionButton.MouseButton1Click:Connect(function()
+            selectedOption = option
+            dropdownButton.Text = selectedOption
+            callback(selectedOption)
+            dropdownList.Size = UDim2.new(0, 150, 0, 0) -- Close the dropdown
+        end)
+    end
+
+    local isDropdownOpen = false
+    dropdownButton.MouseButton1Click:Connect(function()
+        isDropdownOpen = not isDropdownOpen
+        dropdownList.Size = isDropdownOpen and UDim2.new(0, 150, 0, #options * 30) or UDim2.new(0, 150, 0, 0)
+    end)
+end
+
+local function createSlider(minValue, maxValue, initialValue, callback)
+    local sliderFrame = Instance.new("Frame")
+    sliderFrame.Parent = frame
+    sliderFrame.Size = UDim2.new(0, 180, 0, 40)
+    sliderFrame.Position = UDim2.new(0, 10, 0, 160)
+    sliderFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+    sliderFrame.BorderSizePixel = 0
+
+    local slider = Instance.new("Frame")
+    slider.Parent = sliderFrame
+    slider.Size = UDim2.new((initialValue - minValue) / (maxValue - minValue), 0, 1, 0)
+    slider.Position = UDim2.new(0, 0, 0, 0)
+    slider.BackgroundColor3 = Color3.new(0.2, 0.4, 0.8)
+
+    local sliderValueLabel = Instance.new("TextLabel")
+    sliderValueLabel.Parent = sliderFrame
+    sliderValueLabel.Size = UDim2.new(0, 180, 0, 40)
+    sliderValueLabel.Position = UDim2.new(0, 0, 0, 0)
+    sliderValueLabel.Text = tostring(initialValue)
+    sliderValueLabel.TextColor3 = Color3.new(1, 1, 1)
+    sliderValueLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+    local isDragging = false
+    local lastMouseX = 0
+
+    slider.MouseButton1Down:Connect(function()
+        isDragging = true
+        lastMouseX = game:GetService("UserInputService"):GetMouseLocation().X
+    end)
+
+    game:GetService("UserInputService").InputChanged:Connect(function(input)
+        if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local mouseDelta = input.Position.X - lastMouseX
+            local newValue = math.clamp(initialValue + (mouseDelta / 180) * (maxValue - minValue), minValue, maxValue)
+            slider.Size = UDim2.new((newValue - minValue) / (maxValue - minValue), 0, 1, 0)
+            sliderValueLabel.Text = tostring(math.floor(newValue))
+            callback(newValue)
+        end
+    end)
+
+    game:GetService("UserInputService").InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            isDragging = false
+        end
+    end)
+end
+
+-- Example usage
+createButton("Click Me", function()
+    print("Button clicked!")
+end)
+
+createToggle("Toggle Me", true, function(isToggled)
+    print("Toggle state: " .. tostring(isToggled))
+end)
+
+createDropdown({"Option 1", "Option 2", "Option 3"}, function(selectedOption)
+    print("Selected option: " .. selectedOption)
+end)
+
+createSlider(0, 100, 50, function(value)
+    print("Slider value: " .. value)
+end)
