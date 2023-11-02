@@ -1,4 +1,4 @@
--- Define your UI elements
+--Ui Elements
 local gui = Instance.new("ScreenGui")
 gui.Parent = game.Players.LocalPlayer.PlayerGui
 gui.Name = "CustomUI"
@@ -147,7 +147,7 @@ local function createSlider(minValue, maxValue, initialValue, callback)
     end)
 end
 
--- Example usage
+-- Example
 createButton("Click Me", function()
     print("Button clicked!")
 end)
